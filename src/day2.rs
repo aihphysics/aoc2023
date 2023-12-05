@@ -26,3 +26,12 @@ pub fn solve_part1(input: &str) -> usize {
             ( r <= 12 && g <= 13 && b <= 14 ).then_some( id + 1 )
         }).sum()
 }
+
+#[aoc(day2, part2)]
+pub fn solve_part2(input: &str) -> u32 {
+    input.lines()
+        .map( | line | {
+            let ( r, g, b ) = parse_line( line );
+            r * g * b
+        }).sum()
+}
