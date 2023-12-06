@@ -25,9 +25,11 @@ pub fn solve_part1(input: &str) -> u32 {
     let cgrd = Grid::from_vec( vecd, x_max );
     let y_max = cgrd.cols()-1;
     let windows: Vec<Window> = get_windows( &cgrd, x_max, y_max );
+
     let mut part_acc = 0u32;
     let mut num_vec: Vec<char> = Vec::with_capacity( 3 );
 
+    // but how to do it so that its not 'c-like'?
     for window in windows {
         for y in window.upper..window.lower {
             let mut deacc: usize = 0;
@@ -57,12 +59,3 @@ pub fn solve_part1(input: &str) -> u32 {
     }
     part_acc
 }
-
-//fn get_symbols ( cgrd: &Grid<char> ) ->Vec<Coordinate>{
-//    cgrd.indexed_iter()
-//        .filter( | ( _, chr ) |
-//            **chr != '.' && chr.is_ascii_punctuation() 
-//        ).map( | ( ( row, col ), _ ) | {
-//            Coordinate{ x: col, y: row }
-//        } ).collect::<Vec<Coordinate>>()
-//}
