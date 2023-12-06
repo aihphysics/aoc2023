@@ -1,18 +1,20 @@
 use grid::*;
-struct Coordinate { x: usize, y: usize }
+struct Window { right: usize, left: usize, upper: usize, lower: usize }
 
-// try this with indexed_iter -> might be a LOT simpler
-fn get_symbols( cgrd:&Grid<char> ) -> Vec<Coordinate>{
-    cgrd.iter_rows()
-        .enumerate()
-        .map( | ( y, row ) | {
-            row.enumerate()
-            .filter( | ( _, char_col ) | **char_col != '.' && char_col.is_ascii_punctuation() )
-            .map( | ( x, _ ) | {
-                Coordinate{ x, y }
-            }
-            ).collect::<Vec<Coordinate>>()
-    } ).into_iter().flatten().collect::<Vec<Coordinate>>()
+ fn make_window ( x: usize, y: usize, x_max: usize, y_max: usize ) -> Window {
+    Window { 
+        right: if x+1 >= x_max {x_max} else { x+1 } + 1, left: x.saturating_sub( 1 ),
+        upper: y.saturating_sub( 1 ), lower: if y+1 >= y_max {y_max} else { y+1 } + 1,
+    }
+ }
+
+fn get_windows ( cgrd: &Grid<char>, x_max: usize, y_max: usize ) ->Vec< Window >{
+    cgrd.indexed_iter()
+        .filter( | ( _, chr ) |
+            **chr != '.' && chr.is_ascii_punctuation() 
+        ).map( | ( ( row, col ), _ ) | {
+            make_window( col, row, x_max, y_max )
+        } ).collect::<Vec<Window>>()
 }
 
 #[aoc(day3, part1)]
@@ -22,21 +24,14 @@ pub fn solve_part1(input: &str) -> u32 {
     let vecd: Vec<char> = input.chars().filter( |c| *c != '\n' ).collect();
     let cgrd = Grid::from_vec( vecd, x_max );
     let y_max = cgrd.cols()-1;
-    let symbols: Vec<Coordinate> = get_symbols( &cgrd );
+    let windows: Vec<Window> = get_windows( &cgrd, x_max, y_max );
     let mut part_acc = 0u32;
     let mut num_vec: Vec<char> = Vec::with_capacity( 3 );
 
-    for coord in symbols {
-
-        let rightmost = if coord.x+1 >= x_max {x_max} else { coord.x+1 }; 
-        let leftmost = coord.x.saturating_sub( 1 );
-        let uppermost = coord.y.saturating_sub( 1 ) ;
-        let lowermost = if coord.y+1 >= y_max {y_max} else { coord.y+1 }; 
-        
-        
-        for y in uppermost..lowermost+1 {
+    for window in windows {
+        for y in window.upper..window.lower {
             let mut deacc: usize = 0;
-            for x in leftmost..rightmost+1 {
+            for x in window.left..window.right {
                 if deacc > 0 { deacc -= 1; continue; }
                 if cgrd[ (y , x) ].is_numeric() {
                     let mut right_step = x+1;
@@ -46,8 +41,8 @@ pub fn solve_part1(input: &str) -> u32 {
                         if right_step == x_max { break; }
                     } 
                     loop {  
-                        if ( !cgrd[ (y, left_step ) ].is_numeric() ){ left_step+=1; break; }
-                        else if ( left_step == 0 ){ break; }
+                        if !cgrd[ (y, left_step ) ].is_numeric() { left_step+=1; break; }
+                        else if left_step == 0 { break; }
                         left_step -= 1;
                     };
                     deacc = right_step - x;
@@ -62,3 +57,12 @@ pub fn solve_part1(input: &str) -> u32 {
     }
     part_acc
 }
+
+//fn get_symbols ( cgrd: &Grid<char> ) ->Vec<Coordinate>{
+//    cgrd.indexed_iter()
+//        .filter( | ( _, chr ) |
+//            **chr != '.' && chr.is_ascii_punctuation() 
+//        ).map( | ( ( row, col ), _ ) | {
+//            Coordinate{ x: col, y: row }
+//        } ).collect::<Vec<Coordinate>>()
+//}
