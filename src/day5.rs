@@ -6,28 +6,11 @@ fn to_block(  string_block: &str ) -> Vec<i64> {
     ).collect()
 }
 
-/*
-current_seeds, next_seeds, mappedd
-for block in blocks {
-    for mapping in mappings {
-        for seed in seeds { 
-            if seed in mapping
-                nextseeds[ seedindex ]  = map( seed )
-        }
-    } 
-    seeds = nextseeds
-}
-*/
-
 struct Seedmap{ source: i64, destination: i64, length:i64, offset: i64 }
 
 impl Seedmap {
 
     fn from_slice( input: &[i64] ) -> Seedmap {
-        //let difference: i64 = match input[0].checked_sub( input[1] ){
-        //    Some( result ) => result as i64,
-        //    None => panic!( "uh oh" )
-        //};
         Seedmap { source: input[1], destination: input[0], length:input[2], offset: input[0] - input[1] }
     }
 
@@ -40,17 +23,11 @@ impl Seedmap {
     }
 }
 
-
 #[aoc(day5, part1)]
 pub fn solve_part1(input: &str) -> i64 {
 
     let mut lines = input.lines();
-    //let seeds = lines.nth( 0 ).unwrap().rsplit_once( ':' ).unwrap().0.split( ' ' ).map( |x| { x.parse::<i64>() } );
-    //let seeds : Vec<i64> = lines.nth( 0 ).unwrap().split_once( ':' ).unwrap().1.split( ' ' ).map( |x| { 
-    let seeds : Vec<i64> = lines.nth( 0 ).unwrap().split_once( ':' ).unwrap().1.trim().split( ' ' ).map( |x| {
-            x.parse::<i64>().unwrap()
-        }
-    ).collect();
+    let seeds : Vec<i64> = lines.nth( 0 ).unwrap().split_once( ':' ).unwrap().1.trim().split( ' ' ).map( |x| { x.parse::<i64>().unwrap() } ).collect();
     lines.nth( 1 );
 
     let mut input_blocks = input.split( "\n\n" );
@@ -78,5 +55,4 @@ pub fn solve_part1(input: &str) -> i64 {
             mapped = vec![ false; current_seeds.len() ];
         } );
     *current_seeds.iter().min().unwrap()
-    
 }
